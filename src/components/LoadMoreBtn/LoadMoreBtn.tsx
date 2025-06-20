@@ -1,6 +1,10 @@
 import css from "./LoadMoreBtn.module.css";
 
-const LoadMoreBtn = ({ onClick }) => {
+type Props = {
+  onClick: () => void;
+};
+
+const LoadMoreBtn = ({ onClick }: Props) => {
   return (
     <div className={css.btnWrapper}>
       <button className={css.btn} type="submit" onClick={onClick}>

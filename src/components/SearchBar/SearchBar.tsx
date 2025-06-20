@@ -1,10 +1,18 @@
 import toast, { Toaster } from "react-hot-toast";
 import css from "./SearchBar.module.css";
 
-const SearchBar = ({ onSearch }) => {
-  const handleSubmit = (evt) => {
+type Props = {
+  onSearch: (newRequest: string, isNewRequest: boolean) => void;
+};
+
+const SearchBar = ({ onSearch }: Props) => {
+  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    const inputValue = evt.currentTarget.elements.text.value.trim();
+
+    const formData = new FormData(evt.currentTarget);
+    const value = formData.get("text") as string;
+
+    const inputValue = value.trim();
     !inputValue && toast("You should write some request first!");
     onSearch(inputValue, true);
 

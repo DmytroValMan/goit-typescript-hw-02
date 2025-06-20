@@ -7,17 +7,20 @@ import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
 import ErrorMessage from "./ErrorMessage/ErrorMessage";
 import Loader from "./Loader/Loader";
 import ImageModal from "./ImageModal/ImageModal";
+import { Image, SelectedImage } from "../types";
 
 const App = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<Image[]>([]);
   const [clicks, setclicks] = useState(1);
-  const [request, setRequest] = useState("");
-  const [error, setError] = useState("");
+  const [request, setRequest] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSearch = async (newRequest, isNewRequest = false) => {
+  const handleSearch = async (newRequest: string, isNewRequest = false) => {
     setError("");
     setRequest(newRequest);
 
@@ -43,10 +46,13 @@ const App = () => {
 
       try {
         setLoading(true);
-        const response = await axios.get("/search/photos", {
-          params: searchParams,
-          headers: { Authorization: `Client-ID ${accessKey}` },
-        });
+        const response = await axios.get<{ results: Image[] }>(
+          "/search/photos",
+          {
+            params: searchParams,
+            headers: { Authorization: `Client-ID ${accessKey}` },
+          }
+        );
         isNewRequest
           ? setImages(response.data.results)
           : setImages((prevImages) => [
@@ -54,19 +60,25 @@ const App = () => {
               ...response.data.results,
             ]);
       } catch (error) {
-        setError(error.message);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("Unknown error");
+        }
       } finally {
         setLoading(false);
       }
     }
   };
 
+  console.log(images);
+
   const handleClicks = () => {
     setclicks(clicks + 1);
     handleSearch(request);
   };
 
-  const openModal = (image) => {
+  const openModal = (image: Image) => {
     setSelectedImage({
       created: image.created_at,
       likes: image.likes,
